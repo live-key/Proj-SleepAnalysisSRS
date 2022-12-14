@@ -54,7 +54,7 @@ apnea_annotations  = ["apnea_central", "apnea_mixed", ...
     "apnea_obstructive", "hypopnea"];
 
 % Analysis start time => 8:50:52 pm
-analysis_start = 20*3600 + 50*60 + 52;
+start_dt = datetime(2020, 1, 8, 20, 50, 52);
 
 % Get apnea occurrences
 all_apnea_times = [];
@@ -65,12 +65,11 @@ for ii = 0:length(apnea_annotations)-1
           % Convert 18-char timestamps to readable time
           char18_timestamp_start  = int64(str2num(apnea_type{jj, 1}));
           dt = System.DateTime(char18_timestamp_start);
+          dt = datetime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
 
-          % Convert apnea time to seconds
-          apnea_times(jj) = 3600*dt.Hour + 60*dt.Minute + dt.Second - analysis_start;
-          if dt.Hour < 12 
-             apnea_times(jj) = apnea_times(jj) + 24*3600;
-          end
+          % Convert apnea time difference to seconds
+          apnea_times(jj) = seconds(dt - start_dt);
+
           % Account for clipped data
           apnea_times(jj) = min(apnea_times(jj), 10*CLIP);
 
