@@ -1,4 +1,4 @@
-% Get patient data; prepare epochs and feature list
+% Get patient data; prepare epochs, feature list, and labels
 % Author: Joe Byrne
 
 clear, clc
@@ -93,3 +93,6 @@ end
 tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
 tabulated_data.ApneaStart = labels;
+
+saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
+save(saveDir, "tabulated_data", "-mat");
