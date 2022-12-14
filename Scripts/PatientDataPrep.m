@@ -65,7 +65,6 @@ for ii = 0:length(apnea_annotations)-1
           % Convert 18-char timestamps to readable time
           char18_timestamp_start  = int64(str2num(apnea_type{jj, 1}));
           dt = System.DateTime(char18_timestamp_start);
-          disp(dt.ToString)
 
           % Convert apnea time to seconds
           apnea_times(jj) = 3600*dt.Hour + 60*dt.Minute + dt.Second - analysis_start;
@@ -80,19 +79,19 @@ for ii = 0:length(apnea_annotations)-1
     all_apnea_times = [all_apnea_times, apnea_times];
 end
 
+% Apply a 1 when epoch time matches apnea start time
 labels = zeros(length(eeg_epochs),1);
 for ii = 1:length(all_apnea_times)
     apnea_start = floor(all_apnea_times(ii)/epoch_length);
     labels(apnea_start) = 1;
-    if length(labels) > length(eeg_epochs)
-        disp("ovf")
-    end
 end
 
 %% Tabulation
+% Tabulate power data
 tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
-tabulated_data.ApneaStart = labels;
+tabulated_data = splitvars(tabulated_data);
 
+% Save data to new file in patient directory
 saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
-save(saveDir, "tabulated_data", "-mat");
+save(saveDir, "tabulated_data", "labels", "-mat");
