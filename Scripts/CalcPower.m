@@ -14,7 +14,7 @@ function p_vector = CalcPower(sig_, dc_)
     p_spectrum = 10*log10(p_spectrum / dc_);
     
     %----------------delta----theta----alpha------beta-------gamma----%
-    band_ranges = { 1:4, 4:8, 8:12, 12:30, 30:length(p_spectrum) }; 
+    band_ranges = { 30*1:30*4, 30*4:30*8, 30*8:30*12, 30*12:30*30, 30*30:length(p_spectrum) }; 
 
     for ii = 1:size(band_ranges, 2)
         p_vector(ii) = mean(p_spectrum(band_ranges{ii}));
