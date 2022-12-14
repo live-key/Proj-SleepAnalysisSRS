@@ -4,23 +4,31 @@
 clear, clc
 close all
 
+%% Setup
+% Target directory
+patient = "P1";
+dataDir = sprintf("..\\Data\\Database\\%s\\Data.mat", patient);
 
-% Vars
+% Target channels
 channel_names  = ["Ffour_Mone"  , "Fthree_Mtwo" , "Cfour_Mone" , ... 
                   "Cthree_Mtwo" , "Otwo_Mone"   , "Oone_Mtwo"   ];
 channel_labels = ["F4-M1" , "F3-M2" , "C4-M1" , ...
                   "C3-M2" , "O2-M1" , "O1-M2"  ];
-timestep = load('..\Data\Database\P1\Data.mat', 'TimeStep');
+
+% Get timestep for timeseries status
+timestep = load(dataDir, 'TimeStep');
 
 % Fig setup
 figure('units','normalized','outerposition',[0 0 1 1])
 tiledlayout(3,2);
 
+%% Execute
 for ii = 1:length(channel_names)
     % Get data
-    eeg = load('..\Data\Database\P2\Data.mat', channel_names(ii)).(channel_names(ii));
+    eeg = load(dataDir, channel_names(ii)).(channel_names(ii));
     EEG{ii} = reshape(eeg, [1, size(eeg,1)*size(eeg,2)]);
     
+    % remove capped data 
     lim = 0.003;
     capped = (EEG{ii}<=-lim)+(EEG{ii}>=lim);
     capped_ind = find(capped==1);
