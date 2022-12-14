@@ -58,21 +58,20 @@ start_dt = datetime(2020, 1, 8, 20, 50, 52);
 
 % Get apnea occurrences
 all_apnea_times = [];
-for ii = 0:length(apnea_annotations)-1
+for ii = 1:length(apnea_annotations)
     % Get apnea annotations
-    apnea_type = load(dataDir, "Annotations").("Annotations").(apnea_annotations(ii+1));
+    apnea_type = load(dataDir, "Annotations").("Annotations").(apnea_annotations(ii));
     for jj = 1:size(apnea_type,1)
-          % Convert 18-char timestamps to readable time
-          char18_timestamp_start  = int64(str2num(apnea_type{jj, 1}));
-          dt = System.DateTime(char18_timestamp_start);
-          dt = datetime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-
-          % Convert apnea time difference to seconds
-          apnea_times(jj) = seconds(dt - start_dt);
-
-          % Account for clipped data
-          apnea_times(jj) = min(apnea_times(jj), 10*CLIP);
-
+        % Convert 18-char timestamp to readable time
+        char18_timestamp_start  = int64(str2num(apnea_type{jj, 1}));
+        dt = System.DateTime(char18_timestamp_start);
+        dt = datetime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
+        
+        % Convert apnea time difference to seconds
+        apnea_times(jj) = seconds(dt - start_dt);
+        
+        % Account for clipped data
+        apnea_times(jj) = min(apnea_times(jj), 10*CLIP);
     end
     % Append to all apnea times store
     all_apnea_times = [all_apnea_times, apnea_times];
