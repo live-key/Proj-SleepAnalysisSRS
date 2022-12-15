@@ -19,7 +19,7 @@ testIndex = cv.test;
 train = tabulated_data(~testIndex, :);
 test  = tabulated_data(testIndex, :);
 
-% Define SVM object
+% Define RFC object
 model = fitensemble(train, labels(~testIndex), 'Bag', 100, 'Tree', 'Type', 'classification');
 
 % Cross-validate model - 10-fold
