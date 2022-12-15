@@ -90,6 +90,13 @@ tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
 tabulated_data = splitvars(tabulated_data);
 
+% Remove INF values (flat signal)
+labels(isinf(tabulated_data.("F4-M1_1"))) = [];
+tabulated_data(isinf(tabulated_data.("F4-M1_1")), :) = [];
+
+
 % Save data to new file in patient directory
 saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
 save(saveDir, "tabulated_data", "labels", "-mat");
+
+
