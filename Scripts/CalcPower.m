@@ -1,8 +1,9 @@
 % Calculate the average power for each of the five frequency bands 
 % Author: Joe Byrne
 % --------------------------------------------------------------------%
-% Input: sig_ -> timeseries array containing wave data segment
-% Output: dc_ -> DC gain of overall signal
+% Input:  sig_      -> timeseries array containing wave data segment
+%         dc_       -> DC gain of overall signal
+% Output: p_vector  -> containing all mean power values of freq bands
 
 function p_vector = CalcPower(sig_, dc_)
     % Retrieve FFT and abs of FFT
@@ -13,6 +14,9 @@ function p_vector = CalcPower(sig_, dc_)
     p_spectrum = aFsig_.^2; 
     p_spectrum = 2*p_spectrum(1:floor(length(Fsig_)/2));
     p_spectrum(1) = p_spectrum(1)/2;
+
+    % dc_ could be zero - iso-electric
+    % Stable reference as opposed to dc_? 
     p_spectrum = 10*log10(p_spectrum / dc_^2);
     
     %-----------------delta------theta------alpha--------beta-----------gamma----%

@@ -33,5 +33,16 @@ prediction = predict(model,test);
 performance = prediction == labels(testIndex);
 fprintf("Overall Performance: \t%.2f%%\n", 100*(mean(performance)));
 
+% - Sub sample the data apnea-wise
+% - Shuffle labels on train data
+%   - randomise the data again 
+%   - Then test on original test data; should yield guess rate accuracy
 
 
+% - Adding sleep stages
+% - Is 70% above guess rate? 
+%   - Assess whether this is guess rate based on majority of apnea data
+
+% Next steps:
+% - Add sleep stage 
+% - Sub sample data

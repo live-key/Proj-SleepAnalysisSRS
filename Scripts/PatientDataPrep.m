@@ -37,6 +37,9 @@ end
 
 %% Feature Extraction
 
+% Potentially add sleep stage to feature vector
+% - (one) hot encoder (0-4?)
+
 % Feature Vector:
 % [ delta,  theta,  alpha, beta,  gamma ]
 
@@ -53,41 +56,34 @@ end
 apnea_annotations  = ["apnea_central", "apnea_mixed", ...
     "apnea_obstructive", "hypopnea"];
 
+stage_annotations = ["sleep_n1", "sleep_n2", "sleep_n3", ...
+    "sleep_rem", "sleep_wake"];
+
 % Analysis start time => 8:50:52 pm
 start_dt = datetime(2020, 1, 8, 20, 50, 52);
 
-% Get apnea occurrences
-all_apnea_times = [];
-for ii = 1:length(apnea_annotations)
-    % Get apnea annotations
-    apnea_type = load(dataDir, "Annotations").("Annotations").(apnea_annotations(ii));
-    for jj = 1:size(apnea_type,1)
-        % Convert 18-char timestamp to readable time
-        char18_timestamp_start  = int64(str2num(apnea_type{jj, 1}));
-        dt = System.DateTime(char18_timestamp_start);
-        dt = datetime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-        
-        % Convert apnea time difference to seconds
-        apnea_times(jj) = seconds(dt - start_dt);
-        
-        % Account for clipped data
-        apnea_times(jj) = min(apnea_times(jj), 10*CLIP);
-    end
-    % Append to all apnea times store
-    all_apnea_times = [all_apnea_times, apnea_times];
-end
+all_apnea_times = CalcTimes(apnea_annotations, start_dt, patient, CLIP);
+all_stage_times = CalcTimes(stage_annotations, start_dt, patient, CLIP);
 
 % Apply a 1 when epoch time matches apnea start time
 labels = zeros(length(eeg_epochs),1);
-for ii = 1:length(all_apnea_times)
-    apnea_start = floor(all_apnea_times(ii)/epoch_length);
+for ii = 1:size(all_apnea_times,2)
+    apnea_start = floor(all_apnea_times(1,ii)/epoch_length);
     labels(apnea_start) = 1;
+end
+
+% One-hot-encode sleep stage data
+stages = zeros(length(eeg_epochs),1);
+for ii = 1:size(all_stage_times,2)
+    stage_start = floor(all_stage_times(1,ii)/epoch_length);
+    stages(stage_start, all_stage_times(2,ii)) = 1;
 end
 
 %% Tabulation
 % Tabulate power data
 tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
+tabulated_data.STAGE = stages;
 tabulated_data = splitvars(tabulated_data);
 
 % Remove INF and NAN values (flat signal)
