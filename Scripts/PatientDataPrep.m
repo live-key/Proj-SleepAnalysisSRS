@@ -7,6 +7,9 @@ close all
 patient = "P1";
 dataDir = sprintf("..\\Data\\Database\\%s\\Data.mat", patient);
 
+% Analysis start time => 8:50:52 pm
+start_dt = datetime(2020, 1, 8, 20, 50, 52);
+
 %% Data Preperation
 
 % Field names for struct extraction
@@ -37,11 +40,8 @@ end
 
 %% Feature Extraction
 
-% Potentially add sleep stage to feature vector
-% - (one) hot encoder (0-4?)
-
 % Feature Vector:
-% [ delta,  theta,  alpha, beta,  gamma ]
+% [ delta,  theta,  alpha, beta,  gamma, n1, n2, n3, rem, wake ]
 
 % Calculate the power associated with each frequency band, in each channel,
 % for each 30s epoch of data
@@ -52,31 +52,25 @@ for channel = 1:size(eeg_epochs, 1)
     end
 end
 
+stage_annotations = ["sleep_n1", "sleep_n2", "sleep_n3", ...
+    "sleep_rem", "sleep_wake"];
+
+all_stage_times = CalcTimes(stage_annotations, start_dt, patient, CLIP);
+stages = OneHot(all_stage_times, length(eeg_epochs), epoch_length);
+
+
 %% Label Extraction
 apnea_annotations  = ["apnea_central", "apnea_mixed", ...
     "apnea_obstructive", "hypopnea"];
 
-stage_annotations = ["sleep_n1", "sleep_n2", "sleep_n3", ...
-    "sleep_rem", "sleep_wake"];
-
-% Analysis start time => 8:50:52 pm
-start_dt = datetime(2020, 1, 8, 20, 50, 52);
-
 all_apnea_times = CalcTimes(apnea_annotations, start_dt, patient, CLIP);
-all_stage_times = CalcTimes(stage_annotations, start_dt, patient, CLIP);
+% labels = OneHot(all_apnea_times, length(eeg_epochs), epoch_length); 
 
-% Apply a 1 when epoch time matches apnea start time
+Apply a 1 when epoch time matches apnea start time
 labels = zeros(length(eeg_epochs),1);
 for ii = 1:size(all_apnea_times,2)
     apnea_start = floor(all_apnea_times(1,ii)/epoch_length);
     labels(apnea_start) = 1;
-end
-
-% One-hot-encode sleep stage data
-stages = zeros(length(eeg_epochs),1);
-for ii = 1:size(all_stage_times,2)
-    stage_start = floor(all_stage_times(1,ii)/epoch_length);
-    stages(stage_start, all_stage_times(2,ii)) = 1;
 end
 
 %% Tabulation
