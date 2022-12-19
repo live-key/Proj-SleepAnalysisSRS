@@ -6,7 +6,7 @@
 % Output: train     -> Train data
 %         test      -> Test data
 
-function [train, test] = SubSampleSplit(data)
+function [train, test, test_ind] = SubSampleSplit(data)
     cv = cvpartition(size(data, 1), 'HoldOut', 0.2);
     test_ind = cv.test;
     train = data(~test_ind, :);

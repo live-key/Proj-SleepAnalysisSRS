@@ -5,7 +5,8 @@ clear, clc
 close all
 
 patient = "P1";
-dataDir = sprintf("..\\Data\\Database\\%s\\Data.mat", patient);
+% dataDir = sprintf("..\\Data\\Database\\%s\\Data.mat", patient);
+dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
 
 % Analysis start time => 8:50:52 pm
 start_dt = datetime(2020, 1, 8, 20, 50, 52);
@@ -55,7 +56,7 @@ end
 stage_annotations = ["sleep_n1", "sleep_n2", "sleep_n3", ...
     "sleep_rem", "sleep_wake"];
 
-all_stage_times = CalcTimes(stage_annotations, start_dt, patient, CLIP);
+all_stage_times = CalcTimes(stage_annotations, start_dt, dataDir, CLIP);
 stages = OneHot(all_stage_times, length(eeg_epochs), epoch_length);
 
 
@@ -63,10 +64,10 @@ stages = OneHot(all_stage_times, length(eeg_epochs), epoch_length);
 apnea_annotations  = ["apnea_central", "apnea_mixed", ...
     "apnea_obstructive", "hypopnea"];
 
-all_apnea_times = CalcTimes(apnea_annotations, start_dt, patient, CLIP);
+all_apnea_times = CalcTimes(apnea_annotations, start_dt, dataDir, CLIP);
 % labels = OneHot(all_apnea_times, length(eeg_epochs), epoch_length); 
 
-Apply a 1 when epoch time matches apnea start time
+% Apply a 1 when epoch time matches apnea start time
 labels = zeros(length(eeg_epochs),1);
 for ii = 1:size(all_apnea_times,2)
     apnea_start = floor(all_apnea_times(1,ii)/epoch_length);
@@ -78,12 +79,13 @@ end
 tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
 tabulated_data.STAGE = stages;
+tabulated_data.LABEL = labels;
 tabulated_data = splitvars(tabulated_data);
 
 % Remove INF and NAN values (flat signal)
-labels = labels(isfinite(tabulated_data.("F4-M1_1")));
 tabulated_data = tabulated_data(isfinite(tabulated_data.("F4-M1_1")), :);
 
 % Save data to new file in patient directory
-saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
-save(saveDir, "tabulated_data", "labels", "-mat");
+% saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
+saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
+save(saveDir, "tabulated_data", "-mat");

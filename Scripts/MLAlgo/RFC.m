@@ -3,27 +3,34 @@
 % Author: Joe Byrne
 
 clear, clc
-addpath Func\
+addpath Func
 
 % Make output reproducible
 rng(42)
 
 % Get tabulated data from patient data prep step
 patient = "P1";
-dataDir = sprintf("..\\..\\Data\\Database\\%s\\MLDataTable.mat", patient);
+% dataDir = sprintf("..\\..\\Data\\Database\\%s\\MLDataTable.mat", patient);
+dataDir = sprintf("../../Data/Database/%s/MLDataTable.mat", patient);
+
 load(dataDir)
 
 % Divide into apnea/no-apnea for subsampling
-data_apnea = tabulated_data(labels == 1, :);
-data_noapn = tabulated_data(labels == 0, :);
+data_apnea = tabulated_data(tabulated_data.LABEL == 1, :);
+data_noapn = tabulated_data(tabulated_data.LABEL == 0, :);
 
 % Partition the data into testing and training data
-[apnea_train, apnea_test] = SubSampleSplit(data_apnea);
-[noapn_train, noapn_test] = SubSampleSplit(data_noapn);
+[apnea_train, apnea_test, apnea_ind] = SubSampleSplit(data_apnea);
+[noapn_train, noapn_test, noapn_ind] = SubSampleSplit(data_noapn);
 
 % Combine into overall data
 train = [apnea_train; noapn_train];
+train_labels = train.LABEL;
+train.LABEL = [];
+
 test  = [apnea_test; noapn_test];
+test_labels = test.LABEL;
+test.LABEL = [];
 
 % Define RFC object
 model = fitensemble(train, labels(~testIndex), 'Bag', 100, 'Tree', 'Type', 'classification');
@@ -37,5 +44,5 @@ fprintf("CrossVal Success Rate: \t%.2f%%\n", 100*(1 - f));
 
 % Use model to predict on test set
 prediction = predict(model,test);
-performance = prediction == labels(testIndex);
+performance = prediction == test_labels;
 fprintf("Overall Performance: \t%.2f%%\n", 100*(mean(performance)));
