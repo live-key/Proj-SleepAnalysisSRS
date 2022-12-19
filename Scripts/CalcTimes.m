@@ -3,7 +3,6 @@
 % --------------------------------------------------------------------%
 % Input:  anno_names    -> array of strings containing annotation names
 %         start_time    -> analysis start time
-%         patient       -> string, patient label
 % Output: all_times     -> all start times of occurences
 
 function all_times = CalcTimes(anno_names, start_time, dir, CLIP)
@@ -12,8 +11,13 @@ function all_times = CalcTimes(anno_names, start_time, dir, CLIP)
     % Get event occurrences
     all_times = [];
     for ii = 1:length(anno_names)
-        % Get annotations
-        type = load(dataDir, "Annotations").("Annotations").(anno_names(ii));
+        try 
+            % Get annotations
+            type = load(dataDir, "Annotations").("Annotations").(anno_names(ii));
+        catch err
+            fprintf("Could not retrieve annotation type: %s\n", anno_names(ii));
+            continue;
+        end
         for jj = 1:size(type,1)
             % Convert 18-char timestamp to readable time
             unix_stamp  = str2double(type{jj, 1});

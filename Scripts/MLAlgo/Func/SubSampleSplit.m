@@ -1,4 +1,3 @@
-
 % Calculate the start times for a given set of metrics (apneas, sleep stages) 
 % Author: Joe Byrne
 % --------------------------------------------------------------------%

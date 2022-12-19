@@ -14,7 +14,7 @@ function p_vector = TCalcPower(sig_)
     % Define bands: delta, theta, alpha, beta, gamma
     band_ranges = [1, 4; 4, 8; 8, 12; 
                     12, 30; 30, 40];
-
+    
     % Calculate output
     for ii = 1:size(band_ranges, 1)
         val_idx = (ff > band_ranges(ii,1)) .* ...
