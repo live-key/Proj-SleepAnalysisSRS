@@ -16,9 +16,8 @@ function all_times = CalcTimes(anno_names, start_time, dir, CLIP)
         type = load(dataDir, "Annotations").("Annotations").(anno_names(ii));
         for jj = 1:size(type,1)
             % Convert 18-char timestamp to readable time
-            char18_timestamp_start  = int64(str2num(type{jj, 1}));
-%             dt = System.DateTime(char18_timestamp_start);
-            dt = datetime(double(char18_timestamp_start)/1e7,'ConvertFrom', ...
+            unix_stamp  = str2double(type{jj, 1});
+            dt = datetime(unix_stamp/1e7,'ConvertFrom', ...
                 'epochtime','Epoch','1-Jan-0001','Format','dd-MMM-yyyy HH:mm:ss');
             
             % Convert time difference to seconds

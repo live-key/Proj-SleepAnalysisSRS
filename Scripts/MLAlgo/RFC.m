@@ -10,7 +10,6 @@ rng(42)
 
 % Get tabulated data from patient data prep step
 patient = "P1";
-% dataDir = sprintf("..\\..\\Data\\Database\\%s\\MLDataTable.mat", patient);
 dataDir = sprintf("../../Data/Database/%s/MLDataTable.mat", patient);
 
 load(dataDir)

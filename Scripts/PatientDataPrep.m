@@ -5,13 +5,14 @@ clear, clc
 close all
 
 patient = "P1";
-% dataDir = sprintf("..\\Data\\Database\\%s\\Data.mat", patient);
 dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
 
 % Analysis start time => 8:50:52 pm
 start_dt = datetime(2020, 1, 8, 20, 50, 52);
 
 %% Data Preperation
+
+disp("Preparing Data...");
 
 % Field names for struct extraction
 channel_names  = ["Ffour_Mone" , "Fthree_Mtwo" , "Cfour_Mone" , "Cthree_Mtwo" , "Otwo_Mone" , "Oone_Mtwo"];
@@ -20,6 +21,7 @@ timestep = load(dataDir, 'TimeStep');
 % Remove unwanted data at end of signal
 CLIP = 3300;
 
+disp("Calculating PSD...");
 for ii = 1:length(channel_names)
     % Get data
     eeg = load(dataDir, channel_names(ii)).(channel_names(ii))(:, 1:CLIP);
@@ -41,6 +43,8 @@ end
 
 %% Feature Extraction
 
+disp("Setting up features...");
+
 % Feature Vector:
 % [ delta,  theta,  alpha, beta,  gamma, n1, n2, n3, rem, wake ]
 
@@ -61,6 +65,9 @@ stages = OneHot(all_stage_times, length(eeg_epochs), epoch_length);
 
 
 %% Label Extraction
+
+disp("Getting labels...");
+
 apnea_annotations  = ["apnea_central", "apnea_mixed", ...
     "apnea_obstructive", "hypopnea"];
 
@@ -75,6 +82,9 @@ for ii = 1:size(all_apnea_times,2)
 end
 
 %% Tabulation
+
+disp("Tabulating and exporting data...");
+
 % Tabulate power data
 tabulated_data = cell2table(feature_vector',  "VariableNames", ...
     ["F4-M1","F3-M2","C4-M1","C3-M2","O2-M1","O1-M2"]);
@@ -86,6 +96,10 @@ tabulated_data = splitvars(tabulated_data);
 tabulated_data = tabulated_data(isfinite(tabulated_data.("F4-M1_1")), :);
 
 % Save data to new file in patient directory
-% saveDir = sprintf("..\\Data\\Database\\%s\\MLDataTable.mat", patient);
 saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
 save(saveDir, "tabulated_data", "-mat");
+
+fprintf("\nExport successful!\n")
+fprintf("Saved data to: \t%s\n", saveDir);
+
+clearvars -except tabulated_data
