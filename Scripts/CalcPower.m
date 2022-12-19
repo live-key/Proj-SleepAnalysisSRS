@@ -17,7 +17,7 @@ function p_vector = CalcPower(sig_, dc_)
 
     % dc_ could be zero - iso-electric
     % Stable reference as opposed to dc_? 
-    p_spectrum = 10*log10(p_spectrum / dc_^2);
+    p_spectrum = pow2db(p_spectrum / dc_^2);
     
     %-----------------delta------theta------alpha--------beta-----------gamma----%
     band_ranges = { 30*1:30*4, 30*4:30*8, 30*8:30*12, 30*12:30*30, 30*30:length(p_spectrum) }; 

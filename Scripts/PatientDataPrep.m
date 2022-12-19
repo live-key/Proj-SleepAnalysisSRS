@@ -26,8 +26,9 @@ for ii = 1:length(channel_names)
     % Get data
     eeg = load(dataDir, channel_names(ii)).(channel_names(ii))(:, 1:CLIP);
     
-    % FFT to retrieve overall DC gain
+    % FFT to retrieve constant denominator
     EEG = reshape(eeg, [1, size(eeg,1)*size(eeg,2)]);
+
     eegFFT = fft(EEG) / length(EEG);
     eegFFT = abs(eegFFT);
     dc(ii) = eegFFT(1);
@@ -62,7 +63,6 @@ stage_annotations = ["sleep_n1", "sleep_n2", "sleep_n3", ...
 
 all_stage_times = CalcTimes(stage_annotations, start_dt, dataDir, CLIP);
 stages = OneHot(all_stage_times, length(eeg_epochs), epoch_length);
-
 
 %% Label Extraction
 
@@ -101,8 +101,6 @@ save(saveDir, "tabulated_data", "-mat");
 
 fprintf("\nExport successful!\n")
 fprintf("Saved data to: \t%s\n", saveDir);
-
 fprintf("\n*************************\n\n")
-
 
 clearvars -except tabulated_data
