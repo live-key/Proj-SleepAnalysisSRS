@@ -11,7 +11,7 @@ dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
 start_dt = datetime(2020, 1, 8, 20, 50, 52);
 
 %% Data Preperation
-
+fprintf("Patient Number %c:\n\n", patient{1}(2))
 disp("Preparing Data...");
 
 % Field names for struct extraction
@@ -101,5 +101,8 @@ save(saveDir, "tabulated_data", "-mat");
 
 fprintf("\nExport successful!\n")
 fprintf("Saved data to: \t%s\n", saveDir);
+
+fprintf("\n*************************\n\n")
+
 
 clearvars -except tabulated_data
