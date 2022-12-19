@@ -4,7 +4,7 @@
 clear, clc
 close all
 
-patient = "P1";
+patient = "P2";
 dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
 
 % Analysis start time => 8:50:52 pm
@@ -28,7 +28,7 @@ for ii = 1:length(channel_names)
     
     % FFT to retrieve constant denominator
     EEG = reshape(eeg, [1, size(eeg,1)*size(eeg,2)]);
-
+    
     eegFFT = fft(EEG) / length(EEG);
     eegFFT = abs(eegFFT);
     dc(ii) = eegFFT(1);
@@ -53,7 +53,7 @@ disp("Setting up features...");
 % for each 30s epoch of data
 for channel = 1:size(eeg_epochs, 1)
     for epoch = 1:size(eeg_epochs, 2)
-        power = CalcPower(eeg_epochs{channel, epoch}, dc(channel));
+        power = TCalcPower(eeg_epochs{channel, epoch});
         feature_vector{channel, epoch} = power;
     end
 end
@@ -92,7 +92,7 @@ tabulated_data.STAGE = stages;
 tabulated_data.LABEL = labels;
 tabulated_data = splitvars(tabulated_data);
 
-% Remove INF and NAN values (flat signal)
+% Remove INF, NAN, and ZERO values (flat signal)
 tabulated_data = tabulated_data(isfinite(tabulated_data.("F4-M1_1")), :);
 
 % Save data to new file in patient directory
