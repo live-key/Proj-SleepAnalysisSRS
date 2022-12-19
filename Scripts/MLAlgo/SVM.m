@@ -44,4 +44,15 @@ fprintf("CrossVal Success Rate: \t%.2f%%\n", 100*(1 - f));
 % Use model to predict on test set
 prediction = predict(model,test);
 performance = prediction == test_labels;
-fprintf("Overall Performance: \t%.2f%%\n", 100*(mean(performance)));
+fprintf("Overall Performance: \t%.2f%%\n\n", 100*(mean(performance)));
+
+% Shuffle test labels up
+test_labels = test_labels(randperm(length(test_labels)));
+
+% Use model to predict on shuffled test set
+prediction = predict(model,test);
+performance = prediction == test_labels;
+fprintf("Shuffled Performance: \t%.2f%%\n", 100*(mean(performance)));
+
+fprintf("Guess Rate: \t\t%.2f%%\n", 100*(1-(size(data_apnea,1)/ ...
+    (size(data_apnea ,1)+size(data_noapn,1)))));
