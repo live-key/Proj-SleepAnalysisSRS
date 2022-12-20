@@ -1,0 +1,13 @@
+% Calculate the start times for a given set of metrics (apneas, sleep stages) 
+% Author: Joe Byrne
+% --------------------------------------------------------------------%
+% Input:  data      -> Sub-sample data to be split
+% Output: train     -> Train data
+%         test      -> Test data
+
+function [tp, tn, fp, fn] = MCC(pred, actual)
+    pred_pos = pred == 1; 
+    pred_neg = pred == 0;
+    act_pos  =  act == 1;
+    act_neg  =  act == 0;
+end

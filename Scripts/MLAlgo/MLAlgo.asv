@@ -1,6 +1,9 @@
 % Fit ML model to patient apnea data using power spectra 
 % Author: Joe Byrne
 
+% MCC - 0 for guessing, calculate that for the shuffle
+% Take REM data and NREM and run seperately on those two subsets
+% Remove sleep stage and compare performance before and after
 % Test different kernels
 % What's the performance ceiling? 
 % What if the sleep physiologist's performance is unreliable? 
@@ -45,7 +48,7 @@ test.LABEL = [];
 
 if model_label == "SVM"
     % Define SVM object
-    model = fitcsvm(train, train_labels, 'KernelFunction', 'polynomial', 'PolynomialOrder', 2);
+    model = fitcsvm(train, train_labels, 'KernelFunction', 'linear');
 elseif model_label == "RFC"
     % Define RFC object
     model = fitensemble(train, train_labels, 'Bag', 100, 'Tree', 'Type', 'classification');
@@ -61,27 +64,31 @@ fprintf("CrossVal Success Rate: \t%.2f%%\n", 100*(1 - f));
 
 % Use model to predict on test set
 prediction = predict(model,test);
-fprintf("Matthews Correlation: \t%.2f%%\n\n", 100*MCC(prediction, test_labels));
+performance = prediction == test_labels;
+fprintf("Overall Performance: \t%.2f%%\n", 100*(mean(performance)));
+fprintf("MCC: \t%.2f%%\n\n", 100*MCC(prediction, test_labels));
 
 %% Shuffle test
 % Shuffle training labels up
-train_labels_shuff = train_labels(randperm(length(train_labels)));
+train_labels = train_labels(randperm(length(train_labels)));
 
 if model_label == "SVM"
     % Define shuffled SVM model
-    model_shuf = fitcsvm(train, train_labels_shuff, 'KernelFunction', 'polynomial', 'PolynomialOrder', 2);
+    model_shuf = fitcsvm(train, train_labels, 'KernelFunction', 'linear');
 elseif model_label == "RFC"
     % Define shuffled SVM model
-    model_shuf = fitensemble(train, train_labels_shuff, 'Bag', 100, 'Tree', 'Type', 'classification');
+    model_shuf = fitensemble(train, train_labels, 'Bag', 100, 'Tree', 'Type', 'classification');
 end
 
+% Use model to predict on test set
+prediction = predict(model_shuf,test);
+performance = prediction == test_labels;
+fprintf("Shuffled Performance: \t%.2f%%\n", 100*(mean(performance)));
+
 % Cross-validate model - 10-fold
-cv_model_shuff = crossval(model_shuf, 'KFold', 10);
+cv_model_shuff = crossval(model, 'KFold', 10);
 
 % Retrieve percentage success rate
 f = kfoldLoss(cv_model_shuff);
 fprintf("Shuffle CrossVal Success: \t%.2f%%\n", 100*(1 - f))
-
-% Use model to predict on test set
-prediction = predict(model_shuf,test);
-fprintf("Matthews Correlation: \t\t%.2f%%\n\n", 100*MCC(prediction, test_labels));
+fprintf("MCC: \t\t\t%.2f%%\n\n", MCC(prediction, test_labels));
