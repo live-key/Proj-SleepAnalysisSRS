@@ -1,11 +1,6 @@
 % Fit ML model to patient apnea data using power spectra 
 % Author: Joe Byrne
 
-% Test different kernels
-% What's the performance ceiling? 
-% What if the sleep physiologist's performance is unreliable? 
-% LDA if time
-
 %% Setup
 clear, clc
 addpath Func
