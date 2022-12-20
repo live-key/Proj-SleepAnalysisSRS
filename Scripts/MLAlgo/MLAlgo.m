@@ -10,10 +10,10 @@
 % LDA if time
 
 %% Setup
-model = "SVM";
-
 clear, clc
 addpath Func
+
+model_label = "SVM";
 
 % Make output reproducible
 rng(42)
@@ -64,33 +64,27 @@ fprintf("CrossVal Success Rate: \t%.2f%%\n", 100*(1 - f));
 
 % Use model to predict on test set
 prediction = predict(model,test);
-performance = prediction == test_labels;
-fprintf("Overall Performance: \t%.2f%%\n", 100*(mean(performance)));
+fprintf("Matthews Correlation: \t%.2f%%\n\n", 100*MCC(prediction, test_labels));
 
 %% Shuffle test
 % Shuffle training labels up
-train_labels = train_labels(randperm(length(train_labels)));
+train_labels_shuff = train_labels(randperm(length(train_labels)));
 
 if model_label == "SVM"
     % Define shuffled SVM model
-    model_shuf = fitcsvm(train, train_labels, 'KernelFunction', 'linear');
+    model_shuf = fitcsvm(train, train_labels_shuff, 'KernelFunction', 'linear');
 elseif model_label == "RFC"
     % Define shuffled SVM model
-    model_shuf = fitensemble(train, train_labels, 'Bag', 100, 'Tree', 'Type', 'classification');
+    model_shuf = fitensemble(train, train_labels_shuff, 'Bag', 100, 'Tree', 'Type', 'classification');
 end
 
-% Use model to predict on test set
-prediction = predict(model_shuf,test);
-performance = prediction == test_labels;
-fprintf("Shuffled Performance: \t%.2f%%\n\n", 100*(mean(performance)));
-
 % Cross-validate model - 10-fold
-cv_model_shuff = crossval(model, 'KFold', 10);
+cv_model_shuff = crossval(model_shuf, 'KFold', 10);
 
 % Retrieve percentage success rate
 f = kfoldLoss(cv_model_shuff);
 fprintf("Shuffle CrossVal Success: \t%.2f%%\n", 100*(1 - f))
 
-%% MCC 
-
-
+% Use model to predict on test set
+prediction = predict(model_shuf,test);
+fprintf("Matthews Correlation: \t\t%.2f%%\n\n", 100*MCC(prediction, test_labels));
