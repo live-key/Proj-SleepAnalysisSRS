@@ -19,11 +19,17 @@ function PatientData(patient, start_dt)
     
     disp("Calculating PSD...");
     for ii = 1:length(channel_names)
-        % Get data
-        eeg = load(dataDir, channel_names(ii)).(channel_names(ii))(:, 1:CLIP);
-            
-        % Divide all six channels of data into 30s epochs
+         % Divide all six channels of data into 30s epochs
         epoch_length = 30;
+
+        % Get data
+        eeg = load(dataDir, channel_names(ii)).(channel_names(ii));
+
+        % Clip data to size
+        CLIP = 30*floor(size(eeg,2)/epoch_length);
+        eeg = eeg(:,1:CLIP);
+            
+
         for jj = 0:CLIP/(0.1 * epoch_length) - 1
             % Take 3 x 10s long columns and reshape 
             epoch = eeg(:, jj*3 + 1:(jj+1)*3);
@@ -66,7 +72,7 @@ function PatientData(patient, start_dt)
     % Apply a 1 when epoch time matches apnea start time
     labels = zeros(length(eeg_epochs),1);
     for ii = 1:size(all_apnea_times,2)
-        apnea_start = floor(all_apnea_times(1,ii)/epoch_length);
+        apnea_start = ceil(all_apnea_times(1,ii)/epoch_length);
         labels(apnea_start) = 1;
     end
     

@@ -8,6 +8,9 @@ function one_hot = OneHot(input_data, epoch_amount, epoch_length)
     one_hot = zeros(epoch_amount, 1);
     for ii = 1:size(input_data,2)
         stage_start = floor(input_data(1,ii)/epoch_length);
+        if stage_start == 0
+            continue; 
+        end
         one_hot(stage_start, input_data(2,ii)) = 1;
     end
 end
