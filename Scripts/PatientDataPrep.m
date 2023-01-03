@@ -7,28 +7,29 @@ close all
 addpath Func
 
 % Setup parameters for data prep 
-num_patients = 2;
 start_patient = 1;
+end_patient   = 4;
 
-for ii = 1:num_patients
+for ii = start_patient:end_patient
     patients(ii) = sprintf("P%s", num2str(ii));
 end
 
 % Analysis start times for each patient
-start_times = { datetime(2020, 1, 8, 20, 51, 00); 
-                datetime(2020, 1, 9, 20, 44, 30);
-                datetime(2020, 1, 9, 20,  4,  0);
-                datetime(2020, 1, 9, 19, 27, 30); };
+start_times = { datetime(2020, 1,  8, 20, 51, 00); 
+                datetime(2020, 1,  9, 20, 44, 30);
+                datetime(2020, 1,  9, 20,  4,  0);
+                datetime(2020, 1,  9, 19, 27, 30);
+                datetime(2020, 1, 14, 21, 30,  0); };
 
 % Get patient data in feature vector
-for ii = start_patient:num_patients
+for ii = start_patient:end_patient
     PatientData(patients(ii), start_times{ii});
 end
 
 % Compile data into one tabulated form
 dataDir = sprintf("../Data/Database/P1/MLDataTable.mat");
 all_data = load(dataDir).tabulated_data;
-for ii = 1:num_patients
+for ii = start_patient:end_patient
     dataDir = sprintf("../Data/Database/%s/MLDataTable.mat", patients(ii));
     patient_data = load(dataDir);
     all_data = [all_data; patient_data.tabulated_data];
@@ -36,3 +37,11 @@ end
 
 saveDir = sprintf("../Data/Database/MLAllData.mat");
 save(saveDir, "all_data", "-mat");
+
+% Check for overall sleep stage overlap
+sleep_stage = table2array(GetSubTable(all_data, "STAGE", true));
+mus = mean(sleep_stage, 2);
+if mus(mus > 0.2)
+    cprintf('_red', '%i ', size(mus(mus > 0.2),1));
+    fprintf("total occurences of sleep stage overlap\n\n")
+end

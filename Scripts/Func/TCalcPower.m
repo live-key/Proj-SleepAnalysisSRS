@@ -12,8 +12,8 @@ function p_vector = TCalcPower(sig_)
     pxx = pow2db(pxx);
     
     % Define bands: delta, theta, alpha, beta, gamma
-    band_ranges = [1, 4; 4, 8; 8, 12; 
-                    12, 30; 30, 40];
+    band_ranges = [ 1,  4;  4,  8;  8, 12; 
+                   12, 30; 30, 40];
     
     % Calculate output
     for ii = 1:size(band_ranges, 1)

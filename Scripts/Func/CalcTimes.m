@@ -16,7 +16,8 @@ function all_times = CalcTimes(anno_names, start_time, dir, CLIP)
             anno_name = anno_names(ii);
             type = load(dataDir, "Annotations").("Annotations").(anno_name);
         catch err
-            fprintf("Could not retrieve annotation type: %s\n", anno_names(ii));
+            cprintf("#ff9900", "Could not retrieve annotation type:");
+            cprintf("blue", " %s\n", anno_names(ii));
             continue;
         end
         for jj = 1:size(type,1)

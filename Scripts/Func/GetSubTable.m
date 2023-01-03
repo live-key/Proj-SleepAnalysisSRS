@@ -15,5 +15,5 @@ function sub_tab = GetSubTable(tab, sub_str, contains)
     if ~contains
         hasMatch = ~hasMatch;
     end
-    sub_tab = tab(:, tab.Properties.VariableNames(hasMatch));
+    sub_tab = tab(:, tab.Properties.VariableNames(find(hasMatch == true)));
 end

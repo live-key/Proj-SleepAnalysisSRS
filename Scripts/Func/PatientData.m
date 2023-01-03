@@ -8,7 +8,7 @@ function PatientData(patient, start_dt)
     %% Data Preperation
     dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
     
-    fprintf("Patient Number %c:\n\n", patient{1}(2))
+    cprintf("*black", "Patient Number %c:\n\n", patient{1}(2))
     disp("Preparing Data...");
     
     % Field names for struct extraction
@@ -93,8 +93,16 @@ function PatientData(patient, start_dt)
     % Save data to new file in patient directory
     saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
     save(saveDir, "tabulated_data", "-mat");
+
+    % Check for patient data sleep stage overlap
+    sleep_stage = table2array(GetSubTable(tabulated_data, "STAGE", true));
+    mus = mean(sleep_stage, 2);
+    if mus(mus > 0.2)
+        fprintf('\n%i occurences of sleep stage overlap\n', size(mus(mus > 0.2),1));
+    end
     
     fprintf("\nExport successful!\n")
-    fprintf("Saved data to: \t%s\n", saveDir);
+    fprintf("Saved data to:");
+    cprintf("magenta", " \t%s\n", saveDir)
     fprintf("\n*************************\n\n")
 end
