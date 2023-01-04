@@ -4,12 +4,14 @@
 % Input:  patient   -> patient label for data
 %         start_dt  -> datetime object of start time of analysis
 
-function PatientData(patient, start_dt)
+function PatientData(patient, start_dt, verbose)
     %% Data Preperation
     dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
     
+    if verbose
     cprintf("*black", "Patient Number %c:\n\n", patient{1}(2))
-    disp("Preparing Data...");
+    disp("Preparing Data...")
+    end
     
     % Field names for struct extraction
     channel_names  = ["Ffour_Mone" , "Fthree_Mtwo" , "Cfour_Mone" , "Cthree_Mtwo" , "Otwo_Mone" , "Oone_Mtwo"];
@@ -17,7 +19,7 @@ function PatientData(patient, start_dt)
     % Remove unwanted data at end of signal
     CLIP = 3300;
     
-    disp("Calculating PSD...");
+    if verbose; disp("Calculating PSD..."); end
     for ii = 1:length(channel_names)
          % Divide all six channels of data into 30s epochs
         epoch_length = 30;
@@ -39,7 +41,7 @@ function PatientData(patient, start_dt)
     
     %% Feature Extraction
     
-    disp("Setting up features...");
+    if verbose; disp("Setting up features..."); end
     
     % Feature Vector:
     % [ delta,  theta,  alpha, beta,  gamma, n1, n2, n3, rem, wake ]
@@ -61,7 +63,7 @@ function PatientData(patient, start_dt)
     
     %% Label Extraction
     
-    disp("Getting labels...");
+    if verbose; disp("Getting labels..."); end
     
     apnea_annotations  = ["apnea_central", "apnea_mixed", ...
         "apnea_obstructive", "hypopnea"];
@@ -78,7 +80,7 @@ function PatientData(patient, start_dt)
     
     %% Tabulation
     
-    disp("Tabulating and exporting data...");
+    if verbose; disp("Tabulating and exporting data..."); end
     
     % Tabulate power data
     tabulated_data = cell2table(feature_vector',  "VariableNames", ...
@@ -94,16 +96,11 @@ function PatientData(patient, start_dt)
     
     saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
     save(saveDir, "tabulated_data", "-mat");
-
-    % Check for patient data sleep stage overlap
-    sleep_stage = table2array(GetSubTable(tabulated_data, "STAGE", true));
-    mus = mean(sleep_stage, 2);
-    if mus(mus > 0.2)
-        fprintf('\n%i occurences of sleep stage overlap\n', size(mus(mus > 0.2),1));
-    end
     
+    if verbose
     fprintf("\nExport successful!\n")
     fprintf("Saved data to:");
     cprintf("magenta", " \t%s\n", saveDir)
     fprintf("\n*************************\n\n")
+    end
 end
