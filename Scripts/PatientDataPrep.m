@@ -8,7 +8,7 @@ addpath Func
 
 % Setup parameters for data prep 
 start_patient = 1;
-end_patient   = 4;
+end_patient   = 1;
 
 for ii = start_patient:end_patient
     patients(ii) = sprintf("P%s", num2str(ii));
@@ -27,15 +27,14 @@ for ii = start_patient:end_patient
 end
 
 % Compile data into one tabulated form
-dataDir = sprintf("../Data/Database/P1/MLDataTable.mat");
-all_data = load(dataDir).tabulated_data;
+all_data = [];
 for ii = start_patient:end_patient
     dataDir = sprintf("../Data/Database/%s/MLDataTable.mat", patients(ii));
     patient_data = load(dataDir);
     all_data = [all_data; patient_data.tabulated_data];
 end
 
-saveDir = sprintf("../Data/Database/MLAllData.mat");
+saveDir = sprintf("../Prod/Data/MLAllData.mat");
 save(saveDir, "all_data", "-mat");
 
 % Check for overall sleep stage overlap
@@ -43,5 +42,8 @@ sleep_stage = table2array(GetSubTable(all_data, "STAGE", true));
 mus = mean(sleep_stage, 2);
 if mus(mus > 0.2)
     cprintf('_red', '%i ', size(mus(mus > 0.2),1));
-    fprintf("total occurences of sleep stage overlap\n\n")
+    cprintf('black', "total occurences of sleep stage overlap\n\n")
 end
+
+fprintf("Saved all patient data to:")
+cprintf("magenta", " \t%s\n", saveDir)

@@ -1,4 +1,4 @@
-% Prepare data for a given patient from PSG data
+% Prepare data for a given patient from PSG
 % Author: Joe Byrne
 % -------------------------------------------------------------------- %
 % Input:  patient   -> patient label for data
@@ -91,6 +91,7 @@ function PatientData(patient, start_dt)
     tabulated_data = tabulated_data(isfinite(tabulated_data.("F4-M1_1")), :);
     
     % Save data to new file in patient directory
+    
     saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
     save(saveDir, "tabulated_data", "-mat");
 
