@@ -8,8 +8,9 @@ close all
 cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
-combos = [1, 1; 2, 2; 3, 3; 4, 4; 
-          5, 5; 1, 3; 1, 5];
+combos = [6, 6; 7, 7; 8, 8; 9, 9; 
+          10, 10; 11, 11; 12, 12;
+          1, 6; 7, 12; 1, 12];
 
 % Run combos
 for ii = 1:size(combos, 1)

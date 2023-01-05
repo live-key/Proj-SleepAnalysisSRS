@@ -9,7 +9,7 @@ function PatientData(patient, start_dt, verbose)
     dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
     
     if verbose
-    cprintf("*black", "Patient Number %c:\n\n", patient{1}(2))
+    cprintf("*black", "Patient Number %s:\n\n", extractAfter(patient, "P"))
     disp("Preparing Data...")
     end
     

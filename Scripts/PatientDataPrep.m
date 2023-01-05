@@ -11,11 +11,20 @@ function PatientDataPrep(start_patient, end_patient, verbose)
     end
     
     % Analysis start times for each patient
-    start_times = { datetime(2020, 1,  8, 20, 51, 00); 
-                    datetime(2020, 1,  9, 20, 44, 30);
-                    datetime(2020, 1,  9, 20,  4,  0);
-                    datetime(2020, 1,  9, 19, 27, 30);
-                    datetime(2020, 1, 14, 21, 30,  0); };
+    start_times = { 
+                    datetime(2020, 1, 08, 20, 51, 00);  % P1
+                    datetime(2020, 1, 09, 20, 44, 30);  % P2
+                    datetime(2020, 1, 09, 20, 04, 00);  % P3
+                    datetime(2020, 1, 09, 19, 27, 30);  % P4
+                    datetime(2020, 1, 14, 21, 30, 00);  % P5
+                    datetime(2020, 1, 15, 19, 15, 30);  % P6
+                    datetime(2020, 1, 16, 18, 40, 00);  % P7
+                    datetime(2020, 1, 22, 20, 05, 30);  % P8
+                    datetime(2020, 1, 22, 18, 36, 00);  % P9
+                    datetime(2020, 1, 22, 18, 58, 00);  % P10
+                    datetime(2020, 1, 23, 20, 30, 30);  % P11
+                    datetime(2020, 1, 23, 21, 27, 00);  % P12
+                  };
     
     % Get patient data in feature vector
     for ii = start_patient:end_patient
