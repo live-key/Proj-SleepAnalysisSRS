@@ -12,6 +12,7 @@ cprintf("_black", "PIPELINE STARTING\n");
 combos = [6, 6; 7, 7; 8, 8; 9, 9; 
           10, 10; 11, 11; 12, 12;
           1, 6; 7, 12; 1, 12];
+combos = [6, 6];
 
 % Run combos
 for ii = 1:size(combos, 1)

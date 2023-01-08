@@ -36,7 +36,7 @@ function PatientDataPrep(start_patient, end_patient, verbose)
     % Compile data into one tabulated form
     all_data = [];
     for ii = start_patient:end_patient
-        dataDir = sprintf("%s/Data/Database/%s/MLDataTable.mat", prefix, patients(ii));
+        dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
         patient_data = load(dataDir);
         all_data = [all_data; patient_data.tabulated_data];
     end
