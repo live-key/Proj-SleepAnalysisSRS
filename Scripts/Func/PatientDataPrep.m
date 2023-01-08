@@ -1,11 +1,11 @@
 % Get multiple patients' data
 % Author: Joe Byrne
 function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
-
-    if nargin <= 4;  verbose = false; end
-    if nargin <= 3;   p_wise = false; end
-    if nargin == 2; category = "All"; end
-
+    
+    if nargin <= 4;                              verbose = false; end
+    if nargin <= 3 || start_patient==end_patient; p_wise = false; end
+    if nargin == 2;                             category = "All"; end
+    
     prefix = "F:";  % "F:"  _or_  "../Data", in my case
     
     addpath Func
@@ -44,16 +44,16 @@ function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
     end
     
     % Seperate data if user so desires
-    switch category
-        case "REM"
-            cat = "STAGE_4";
-            cat_tab = table2array(GetSubTable(all_data, cat, true));
-            all_data = GetSubTable(all_data(logical(cat_tab), :), "STAGE", false);
-        case "NREM"
-            cat = ["STAGE_1", "STAGE_2", "STAGE_3"];
-            cat_tab = table2array(GetSubTable(all_data, cat, true));
-            cat_idx = cat_tab(:, 1) + cat_tab(:, 2) + cat_tab(:, 3); 
-            all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
+    if category == "REM"
+        cat = "STAGE_4";
+        cat_tab = table2array(GetSubTable(all_data, cat, true));
+        all_data = GetSubTable(all_data(logical(cat_tab), :), "STAGE", false);
+    
+    elseif category == "NREM"
+        cat = ["STAGE_1", "STAGE_2", "STAGE_3"];
+        cat_tab = table2array(GetSubTable(all_data, cat, true));
+        cat_idx = cat_tab(:, 1) + cat_tab(:, 2) + cat_tab(:, 3); 
+        all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
     end
     
     % Attempt to save data
