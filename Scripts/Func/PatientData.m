@@ -6,7 +6,8 @@
 
 function PatientData(patient, start_dt, verbose)
     %% Data Preperation
-    dataDir = sprintf("../Data/Database/%s/Data.mat", patient);
+    prefix = "F:";
+    dataDir = sprintf("%s/Data/Database/%s/Data.mat", prefix, patient);
     
     if verbose
     cprintf("*black", "Patient Number %s:\n\n", extractAfter(patient, "P"))
@@ -94,7 +95,7 @@ function PatientData(patient, start_dt, verbose)
     
     % Save data to new file in patient directory
     
-    saveDir = sprintf("../Data/Database/%s/MLDataTable.mat", patient);
+    saveDir = sprintf("%s/Data/Database/%s/MLDataTable.mat", prefix, patient);
     save(saveDir, "tabulated_data", "-mat");
     
     if verbose

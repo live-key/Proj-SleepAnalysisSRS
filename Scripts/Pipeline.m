@@ -4,6 +4,7 @@
 
 clear, clc
 close all
+addpath Func
 
 cprintf("_black", "PIPELINE STARTING\n");
 
