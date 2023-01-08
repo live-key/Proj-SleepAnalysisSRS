@@ -1,10 +1,13 @@
 % Fit ML model to patient apnea data using power spectra 
 % Author: Joe Byrne
 
-function MLAlgo(model_label, verbose) 
-    if nargin == 1; verbose = false; end
+function MLAlgo(model_label, category, verbose) 
+
+    if nargin <= 2; verbose = false; end
+    if nargin == 1; category = "All"; end
+
     %% Setup
-    cprintf("black*", "%s Model\n\n", model_label);
+    cprintf("black*", "*%s-%s* Model\n\n", model_label, category);
     if verbose; disp("Setting Up Workspace..."); end
     
     addpath Func
@@ -13,7 +16,7 @@ function MLAlgo(model_label, verbose)
     rng(42)
     
     % Get all data
-    dataDir = sprintf("../../Prod/Data/MLAllData.mat");
+    dataDir = sprintf("../../Prod/Data/ML%sData.mat", category);
     data = load(dataDir).all_data;
     
     %% Data split

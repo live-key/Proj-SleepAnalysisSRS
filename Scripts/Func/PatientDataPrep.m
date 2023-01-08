@@ -1,8 +1,9 @@
 % Get multiple patients' data
 % Author: Joe Byrne
-function PatientDataPrep(start_patient, end_patient, verbose)
+function PatientDataPrep(start_patient, end_patient, category, verbose)
 
-    if nargin == 2; verbose = false; end
+    if nargin <= 3; verbose = false; end
+    if nargin == 2; category = "All"; end
 
     prefix = "F:";
 
@@ -41,7 +42,20 @@ function PatientDataPrep(start_patient, end_patient, verbose)
         all_data = [all_data; patient_data.tabulated_data];
     end
     
-    saveDir = sprintf("../Prod/Data/MLAllData.mat");
+    % Seperate data if user so desires
+    switch category
+        case "REM"
+            cat = "STAGE_4";
+            cat_tab = table2array(GetSubTable(all_data, cat, true));
+            all_data = GetSubTable(all_data(logical(cat_tab), :), "STAGE", false);
+        case "NREM"
+            cat = ["STAGE_1", "STAGE_2", "STAGE_3"];
+            cat_tab = table2array(GetSubTable(all_data, cat, true));
+            cat_idx = cat_tab(:, 1) + cat_tab(:, 2) + cat_tab(:, 3); 
+            all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
+    end
+    
+    saveDir = sprintf("../Prod/Data/ML%sData.mat", category);
     save(saveDir, "all_data", "-mat");
     
     if verbose
