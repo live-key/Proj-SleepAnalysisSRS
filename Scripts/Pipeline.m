@@ -9,8 +9,8 @@ addpath Func
 cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
-combos = [1, 1, "REM";
-          1, 1, "NREM"];
+combos = [2, 2, "REM";
+          2, 2, "NREM"];
 
 % Run combos
 for ii = 1:size(combos, 1)
