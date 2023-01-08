@@ -6,8 +6,8 @@ function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
     if nargin <= 3;   p_wise = false; end
     if nargin == 2; category = "All"; end
 
-    prefix = "F:";
-
+    prefix = "F:";  % "F:"  _or_  "../Data", in my case
+    
     addpath Func
     
     for ii = start_patient:end_patient
@@ -56,9 +56,17 @@ function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
             all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
     end
     
-    saveDir = sprintf("../Prod/Data/ML%sData.mat", category);
-    save(saveDir, "all_data", "-mat");
-    
+    % Attempt to save data
+    saveDir = sprintf("../Prod/MLData");
+    saveFile = sprintf("%s/%sData.mat", saveDir, category);
+    try
+        save(saveFile, "all_data", "-mat");
+    catch
+        if verbose; fprintf("Making Directory:\t%s\n", saveDir); end
+        mkdir(saveDir)
+        save(saveFile, "all_data", "-mat");
+    end
+
     if verbose
     fprintf("Saved all patient data to:")
     cprintf("magenta", " \t%s\n\n", saveDir)

@@ -17,7 +17,7 @@ function MLAlgo(model_label, category, p_wise, verbose)
     rng(42)
     
     % Get all data
-    dataDir = sprintf("../../Prod/Data/ML%sData.mat", category);
+    dataDir = sprintf("../../Prod/MLData/%sData.mat", category);
     data = load(dataDir).all_data;
     
     %% Data split
@@ -115,8 +115,16 @@ function MLAlgo(model_label, category, p_wise, verbose)
    
     if usr_save == "y"
         clear usr_save data
-        saveDir = sprintf("../../Prod/Models/%s-model_%s.mat", model_label, datestr(now,'mm-dd'));
-        save(saveDir, "-mat");
+        
+        saveDir = sprintf("../Prod/MLModels");
+        saveFile = sprintf("%s-model_%s.mat", model_label, datestr(now,'mm-dd'));
+        try
+            save(saveFile, "-mat");
+        catch
+            fprintf("Making Directory:\t%s\n", saveDir);
+            mkdir(saveDir)
+            save(saveFile, "-mat");
+        end
         fprintf("\nSaved model and associated data to:")
         cprintf("magenta", " \t%s\n", saveDir)
     end

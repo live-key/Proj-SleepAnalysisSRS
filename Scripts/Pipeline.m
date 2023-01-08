@@ -22,8 +22,8 @@ for ii = 1:size(combos, 1)
     cprintf("_black", "\n\nPipeline Iteration %i: Patients %i-to-%i, %s Data\n\n", ...
         ii, start_patient, end_patient, category);
 
-%     % Prep the patient data for this run
-%     PatientDataPrep(start_patient, end_patient, category);
+    % Prep the patient data for this run
+    PatientDataPrep(start_patient, end_patient, category);
     
     % Train and evaluate model
     cd MLAlgo
