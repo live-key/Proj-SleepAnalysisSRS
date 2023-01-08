@@ -1,8 +1,9 @@
 % Get multiple patients' data
 % Author: Joe Byrne
-function PatientDataPrep(start_patient, end_patient, category, verbose)
+function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
 
-    if nargin <= 3; verbose = false; end
+    if nargin <= 4;  verbose = false; end
+    if nargin <= 3;   p_wise = false; end
     if nargin == 2; category = "All"; end
 
     prefix = "F:";

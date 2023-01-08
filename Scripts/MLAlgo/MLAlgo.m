@@ -1,9 +1,10 @@
 % Fit ML model to patient apnea data using power spectra 
 % Author: Joe Byrne
 
-function MLAlgo(model_label, category, verbose) 
+function MLAlgo(model_label, category, p_wise, verbose) 
 
-    if nargin <= 2; verbose = false; end
+    if nargin <= 3;  verbose = false; end
+    if nargin <= 2;   p_wise = false; end
     if nargin == 1; category = "All"; end
 
     %% Setup
@@ -22,23 +23,30 @@ function MLAlgo(model_label, category, verbose)
     %% Data split
     
     if verbose; disp("Splitting Data..."); end
-    
-    % Divide into apnea/no-apnea for subsampling
-    data_apnea = data(data.LABEL == 1, :);
-    data_noapn = data(data.LABEL == 0, :);
-    
-    % Partition the data into testing and training data
-    [apnea_train, apnea_test] = SubSampleSplit(data_apnea);
-    [noapn_train, noapn_test] = SubSampleSplit(data_noapn);
-    
-    % Combine into overall data
-    train = [apnea_train; noapn_train];
-    train_labels = train.LABEL;
-    train.LABEL = [];
-    
-    test  = [apnea_test; noapn_test];
-    test_labels = test.LABEL;
-    test.LABEL = [];
+   
+    if ~p_wise
+        % Pool data and split
+        % ------------------- %
+        % Divide into apnea/no-apnea for subsampling
+        data_apnea = data(data.LABEL == 1, :);
+        data_noapn = data(data.LABEL == 0, :);
+        
+        % Partition the data into testing and training data
+        [apnea_train, apnea_test] = SubSampleSplit(data_apnea);
+        [noapn_train, noapn_test] = SubSampleSplit(data_noapn);
+        
+        % Combine into overall data
+        train = [apnea_train; noapn_train];
+        train_labels = train.LABEL;
+        train.LABEL = [];
+        
+        test  = [apnea_test; noapn_test];
+        test_labels = test.LABEL;
+        test.LABEL = [];
+    else
+        % Split data patient-wise
+        % ----------------------- %
+    end
     
     %% Train model
     
