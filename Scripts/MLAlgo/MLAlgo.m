@@ -1,11 +1,12 @@
 % Fit ML model to patient apnea data using power spectra 
 % Author: Joe Byrne
+% Revise subsampling 
 
-function MLAlgo(model_label, category, p_wise, verbose) 
+function MLAlgo(model_label, category, split, verbose) 
 
     if nargin <= 3;  verbose = false; end
-    if nargin <= 2;   p_wise = false; end
-    if nargin == 1; category = "All"; end
+    if nargin <= 2;   split = "POOL"; end
+    if nargin == 1; category = "ALL"; end
 
     %% Setup
     cprintf("black*", "*%s-%s* Model\n\n", model_label, category);
@@ -17,15 +18,18 @@ function MLAlgo(model_label, category, p_wise, verbose)
     rng(42)
     
     % Get all data
-    dataDir = sprintf("../../Prod/MLData/%sData.mat", category);
+    dataDir = sprintf("../../Prod/MLData/%sData%s.mat", category, split);
     data = load(dataDir).all_data;
     
     %% Data split
     
     if verbose; disp("Splitting Data..."); end
    
-    if ~p_wise
-        % Pool data and split
+    if split == "PWISE"
+        % Split data patient-wise
+        % ----------------------- %
+    else
+        % Pool data split
         % ------------------- %
         % Divide into apnea/no-apnea for subsampling
         data_apnea = data(data.LABEL == 1, :);
@@ -43,9 +47,6 @@ function MLAlgo(model_label, category, p_wise, verbose)
         test  = [apnea_test; noapn_test];
         test_labels = test.LABEL;
         test.LABEL = [];
-    else
-        % Split data patient-wise
-        % ----------------------- %
     end
     
     %% Train model

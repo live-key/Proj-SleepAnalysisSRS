@@ -1,12 +1,14 @@
 % Get multiple patients' data
 % Author: Joe Byrne
-function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
+function PatientDataPrep(start_patient, end_patient, category, split, verbose)
     
     if nargin <= 4;                              verbose = false; end
-    if nargin <= 3 || start_patient==end_patient; p_wise = false; end
-    if nargin == 2;                             category = "All"; end
+    if nargin <= 3 || start_patient==end_patient; split = "POOL"; end
+    if nargin == 2;                             category = "ALL"; end
+
+    split = split.upper();
     
-    prefix = "F:";  % "F:"  _or_  "../Data", in my case
+    prefix = "../Data";  % "F:"  _or_  "../Data", in my case
     
     addpath Func
     
@@ -34,13 +36,18 @@ function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
     for ii = start_patient:end_patient
         PatientData(patients(ii), start_times{ii}, verbose);
     end
-    
-    % Compile data into one tabulated form
-    all_data = [];
-    for ii = start_patient:end_patient
-        dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
-        patient_data = load(dataDir);
-        all_data = [all_data; patient_data.tabulated_data];
+    if split == "PWISE"
+        % Discretise data per patient
+    else
+        % Pool data
+        % ------------------- %
+        % Compile data into one tabulated form
+        all_data = [];
+        for ii = start_patient:end_patient
+            dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
+            patient_data = load(dataDir);
+            all_data = [all_data; patient_data.tabulated_data];
+        end
     end
     
     % Seperate data if user so desires
@@ -58,7 +65,7 @@ function PatientDataPrep(start_patient, end_patient, category, p_wise, verbose)
     
     % Attempt to save data
     saveDir = sprintf("../Prod/MLData");
-    saveFile = sprintf("%s/%sData.mat", saveDir, category);
+    saveFile = sprintf("%s/%sData%s.mat", saveDir, category, split);
     try
         save(saveFile, "all_data", "-mat");
     catch

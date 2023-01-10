@@ -6,7 +6,7 @@
 
 function PatientData(patient, start_dt, verbose)
     %% Data Preperation
-    prefix = "F:";
+    prefix = "../Data";
     dataDir = sprintf("%s/Database/%s/Data.mat", prefix, patient);
     
     if verbose
