@@ -10,8 +10,10 @@ function performance = MLAlgo(model_label, run)
     split       = run.split;
     verbose     = run.verbose;
 
+    performance = [];
+
     %% Setup
-    cprintf("black*", "*%s-%s* Model\n\n", model_label, category);
+    cprintf("black*", "Training and Testing *%s-%s* Model\n\n", model_label, category);
     if verbose; disp("Setting Up Workspace..."); end
     
     addpath Func
@@ -20,7 +22,7 @@ function performance = MLAlgo(model_label, run)
     rng(42)
     
     % Get all data
-    dataDir = run.filePath;
+    dataDir = sprintf("../%s", run.filePath);
 
     try 
         data = load(dataDir).all_data;

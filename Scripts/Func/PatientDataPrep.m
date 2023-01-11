@@ -70,9 +70,9 @@ function run = PatientDataPrep(run)
     
     % Attempt to save data
     saveDir = sprintf("../Prod/MLData");
-    saveFile = sprintf("%s/%i-%i_%s_%s_Data.mat", sp, ep, saveDir, category, split);
+    saveFile = sprintf("%s/%i-%i_%s_%s_Data.mat", saveDir, sp, ep, category, split);
     run.filePath = saveFile;
-    
+
     try
         save(saveFile, "all_data", "-mat");
     catch

@@ -16,12 +16,6 @@ combos = [
             1, 5, "All", "POOL";
             1, 6, "All", "POOL";
             7, 12, "All", "POOL";
-            1, 12, "All", "POOL";
-            1, 12, "REM", "POOL";
-            1, 12, "NREM", "POOL";
-            1, 12, "NREM", "POOL";
-            1, 12, "NREM", "POOL";
-            1, 12, "NREM", "POOL";
          ];
 
 % Run combos
