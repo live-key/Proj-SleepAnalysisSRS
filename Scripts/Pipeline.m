@@ -12,55 +12,72 @@ write2excel = true;
 
 % Patient Combinations
 combos = [
-            1, 3, "All", "PWISE";
-            1, 5, "All", "PWISE";
-            1, 6, "All", "PWISE";
-            7, 12, "All", "PWISE";
-            1, 12, "All", "PWISE";
-            1, 12, "REM", "PWISE";
-            1, 12, "NREM", "PWISE";
+            1, 3, "All", "POOL";
+            1, 5, "All", "POOL";
+            1, 6, "All", "POOL";
+            7, 12, "All", "POOL";
+            1, 12, "All", "POOL";
+            1, 12, "REM", "POOL";
+            1, 12, "NREM", "POOL";
+            1, 12, "NREM", "POOL";
+            1, 12, "NREM", "POOL";
+            1, 12, "NREM", "POOL";
          ];
 
 % Run combos
 for ii = 1:size(combos, 1)
-    % Setup parameters for data prep 
-    start_patient = str2num(combos(ii, 1));
-    end_patient   = str2num(combos(ii, 2));
-    category      = combos(ii, 3);
-    split         = combos(ii, 4);
+    % Setup parameters for run 
+    run.start_patient = str2num(combos(ii, 1));
+    run.end_patient   = str2num(combos(ii, 2));
+    run.category      = combos(ii, 3);
+    run.split         = combos(ii, 4);
+    run.verbose       = false;
+    run.first         = false;
 
-    cprintf("_black", "\n\nPipeline Iteration %i: Patients %i-to-%i, %s Data\n\n", ...
-        ii, start_patient, end_patient, category);
+    cprintf("_black", "\n\nPipeline Iteration %i: %s Patients %i-to-%i, %s Data\n\n", ...
+        ii, run.split, run.start_patient, run.end_patient, run.category);
 
     % Prep the patient data for this run
-    PatientDataPrep(start_patient, end_patient, category, split);
+    run = PatientDataPrep(run);
     
     % Train and evaluate model
     cd MLAlgo
-    [svm(ii, 1), svm(ii, 2), svm(ii, 3), svm(ii, 4)] = MLAlgo("SVM", category, split);
-    [rfc(ii, 1), rfc(ii, 2), rfc(ii, 3), rfc(ii, 4)] = MLAlgo("RFC", category, split);
+    svm(ii) = MLAlgo("SVM", run);
+    rfc(ii) = MLAlgo("RFC", run);
     cd ..
 end
 
 % Write data to results file
 if write2excel
-        resultsDir = sprintf("../Deliverables/PerformanceRecord.xlsx");
+        resultsDir = sprintf("../Deliverables");
+        fileName = input("Please input desired filename to write results to: ", 's');
+        
+        filePath = sprintf("%s/%s.xlsx", resultsDir, fileName);
+        while ~isfile(filePath)
+            fileName = input("Input file does not exist.  Please input a valid Excel filename from Deliverables directory: ", 's');
+            filePath = sprintf("%s/%s.xlsx", resultsDir, fileName);
+        end
 
-        svm_cell = "B3";
+        sheet = input("Please input desired sheet to write results to: ", 's');
+        
+        [~,sheetNames] = xlsfinfo(filePath);
+        sheetValid = any(strcmp(sheetNames, sheet));
+
+        while ~sheetValid
+            sheet = input("Input sheet does not exist.  Please input a valid Excel worksheet from given file: ", 's');
+            [~,sheetNames] = xlsfinfo(filePath);
+            sheetValid = any(strcmp(sheetNames, sheet));
+        end
+
+        svm_cell = input("Please input start cell for SVM data: ", 's');
         rfc_cell = sprintf("B%i", 3+1+size(combos, 1));
         
         err = true;
         
         while err
             try 
-                svm_c = num2cell(svm);
-                rfc_c = num2cell(rfc);
-
-                svm_c(isnan(svm)) = {'NaN'};
-                rfc_c(isnan(rfc)) = {'NaN'};
-
-                writecell(svm_c, resultsDir, 'Sheet', 'Patient-Wise Data', 'Range', svm_cell, 'AutoFitWidth', false);
-                writecell(rfc_c, resultsDir, 'Sheet', 'Patient-Wise Data', 'Range', rfc_cell, 'AutoFitWidth', false);
+                ProcWrite(svm, svm_cell, resultsDir);
+                ProcWrite(rfc, rfc_cell, resultsDir);
                 
                 fprintf("Data written to file:\t%s\n", resultsDir)
                 

@@ -1,16 +1,18 @@
 % Get multiple patients' data
 % Author: Joe Byrne
-function PatientDataPrep(start_patient, end_patient, category, split, recalc, verbose)
+function run = PatientDataPrep(run)
     
-    if nargin <= 5; verbose = false; end
-    if nargin <= 4; recalc = false; end
-    if nargin <= 3 || start_patient==end_patient; split = "POOL"; end
-    if nargin == 2; category = "ALL"; end
+    sp          = run.start_patient;
+    ep          = run.end_patient;
+    category    = run.category;
+    split       = run.split;
+    recalc      = run.first;
+    verbose     = run.verbose;
     
     addpath Func
     addpath MLAlgo/Func
     
-    for ii = start_patient:end_patient
+    for ii = sp:ep
         patients(ii) = sprintf("P%s", num2str(ii));
     end
 
@@ -25,7 +27,7 @@ function PatientDataPrep(start_patient, end_patient, category, split, recalc, ve
     
     % Get patient data in feature vector
     if recalc
-        for ii = start_patient:end_patient
+        for ii = sp:ep
             PatientData(patients(ii), start_times{ii}, verbose);
         end
     end
@@ -34,11 +36,11 @@ function PatientDataPrep(start_patient, end_patient, category, split, recalc, ve
         % Discretise data per patient
         % ------------------- %
         % Compile data into one cell array
-        all_data = cell(end_patient-start_patient+1, 1);
-        for ii = start_patient:end_patient
+        all_data = cell(ep-sp+1, 1);
+        for ii = sp:ep
             dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
             patient_data = load(dataDir);
-            all_data{ii-start_patient+1, 1} = patient_data.tabulated_data;
+            all_data{ii-sp+1, 1} = patient_data.tabulated_data;
         end
         all_data = CellCat(all_data);
     else
@@ -46,7 +48,7 @@ function PatientDataPrep(start_patient, end_patient, category, split, recalc, ve
         % ------------------- %
         % Compile data into one tabulated form
         all_data = [];
-        for ii = start_patient:end_patient
+        for ii = sp:ep
             dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
             patient_data = load(dataDir);
             all_data = [all_data; patient_data.tabulated_data];
@@ -68,7 +70,9 @@ function PatientDataPrep(start_patient, end_patient, category, split, recalc, ve
     
     % Attempt to save data
     saveDir = sprintf("../Prod/MLData");
-    saveFile = sprintf("%s/%s_%s_Data.mat", saveDir, category, split);
+    saveFile = sprintf("%s/%i-%i_%s_%s_Data.mat", sp, ep, saveDir, category, split);
+    run.filePath = saveFile;
+    
     try
         save(saveFile, "all_data", "-mat");
     catch

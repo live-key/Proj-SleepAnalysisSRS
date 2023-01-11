@@ -2,11 +2,13 @@
 % Author: Joe Byrne
 % Revise subsampling 
 
-function [perf, mcc, perf_shuff, mcc_shuff] = MLAlgo(model_label, category, split, verbose) 
-
-    if nargin <= 3;  verbose = false; end
-    if nargin <= 2;   split = "POOL"; end
-    if nargin == 1; category = "ALL"; end
+function performance = MLAlgo(model_label, run) 
+    
+    sp          = run.start_patient;
+    ep          = run.end_patient;
+    category    = run.category;
+    split       = run.split;
+    verbose     = run.verbose;
 
     %% Setup
     cprintf("black*", "*%s-%s* Model\n\n", model_label, category);
@@ -18,7 +20,7 @@ function [perf, mcc, perf_shuff, mcc_shuff] = MLAlgo(model_label, category, spli
     rng(42)
     
     % Get all data
-    dataDir = sprintf("../../Prod/MLData/%s_%s_Data.mat", category, split);
+    dataDir = run.filePath;
 
     try 
         data = load(dataDir).all_data;
@@ -82,14 +84,20 @@ function [perf, mcc, perf_shuff, mcc_shuff] = MLAlgo(model_label, category, spli
     % Retrieve percentage success rate
     f = kfoldLoss(CVModel);
     perf = 100*(1 - f);
-    fprintf("CrossVal Success Rate:");
-    cprintf("blue", " \t%.2f%%\n", perf);
+
+    if verbose
+        fprintf("CrossVal Success Rate:");
+        cprintf("blue", " \t%.2f%%\n", perf);
+    end
     
     % Use model to predict on test set
     prediction = predict(model,test);
     mcc = 100*MCC(prediction, test_labels);
-    fprintf("Matthews Correlation:");
-    cprintf("blue", " \t%.2f%%\n\n", mcc);
+
+    if verbose
+        fprintf("Matthews Correlation:");
+        cprintf("blue", " \t%.2f%%\n\n", mcc);
+    end
     
     %% Shuffle test
     
@@ -114,14 +122,23 @@ function [perf, mcc, perf_shuff, mcc_shuff] = MLAlgo(model_label, category, spli
     % Retrieve percentage success rate
     f = kfoldLoss(cv_model_shuff);
     perf_shuff = 100*(1 - f);
-    fprintf("Shuffle CrossVal Success:");
-    cprintf("blue", " \t%.2f%%\n", perf_shuff);
+
+    if verbose
+        fprintf("Shuffle CrossVal Success:");
+        cprintf("blue", " \t%.2f%%\n", perf_shuff);
+    end
     
     % Use model to predict on test set
     prediction = predict(model_shuf,test);
     mcc_shuff = 100*MCC(prediction, test_labels);
-    fprintf("Matthews Correlation:");
-    cprintf("blue", " \t\t%.2f%%\n\n", mcc_shuff);
+
+    if verbose
+        fprintf("Matthews Correlation:");
+        cprintf("blue", " \t\t%.2f%%\n\n", mcc_shuff);
+    end
+
+    % Function output
+    performance = [perf, mcc, perf_shuff, mcc_shuff];
     
     %% Save Model Setup
 
