@@ -12,11 +12,16 @@ cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
 combos = {
-            1, 3, "All", "POOL";
-            1, 5, "All", "POOL";
             1, 6, "All", "POOL";
             7, 12, "All", "POOL";
+            1, 12, "All", "POOL";
+            1, 6, "All", "PWISE";
+            7, 12, "All", "PWISE";
+            1, 12, "All", "PWISE";
          };
+
+svm = [];
+rfc = [];
 
 %% Run Pipeline Combinations
 
@@ -43,6 +48,7 @@ for ii = 1:size(combos, 1)
 end
 
 %% Write Data to Results File
+if isempty(svm) || isempty(rfc); return; end
 
 if input("Write to Excel file? (y/n): ", 's') == "y"
     % Get valid file path and sheet name
