@@ -1,43 +1,46 @@
 % Get multiple patients' data
 % Author: Joe Byrne
-function PatientDataPrep(start_patient, end_patient, category, split, verbose)
+function PatientDataPrep(start_patient, end_patient, category, split, recalc, verbose)
     
-    if nargin <= 4;                              verbose = false; end
+    if nargin <= 5; verbose = false; end
+    if nargin <= 4; recalc = false; end
     if nargin <= 3 || start_patient==end_patient; split = "POOL"; end
-    if nargin == 2;                             category = "ALL"; end
-
-    split = split.upper();
-    
-    prefix = "../Data";  % "F:"  _or_  "../Data", in my case
+    if nargin == 2; category = "ALL"; end
     
     addpath Func
+    addpath MLAlgo/Func
     
     for ii = start_patient:end_patient
         patients(ii) = sprintf("P%s", num2str(ii));
     end
+
+    split = split.upper();
+    prefix = "../Data";  % "F:"  _or_  "../Data", in my case
     
     % Analysis start times for each patient
-    start_times = { 
-                    datetime(2020, 1, 08, 20, 51, 00);  % P1
-                    datetime(2020, 1, 09, 20, 44, 30);  % P2
-                    datetime(2020, 1, 09, 20, 04, 00);  % P3
-                    datetime(2020, 1, 09, 19, 27, 30);  % P4
-                    datetime(2020, 1, 14, 21, 30, 00);  % P5
-                    datetime(2020, 1, 15, 19, 15, 30);  % P6
-                    datetime(2020, 1, 16, 18, 40, 00);  % P7
-                    datetime(2020, 1, 22, 20, 05, 30);  % P8
-                    datetime(2020, 1, 22, 18, 36, 00);  % P9
-                    datetime(2020, 1, 22, 18, 58, 00);  % P10
-                    datetime(2020, 1, 23, 20, 30, 30);  % P11
-                    datetime(2020, 1, 23, 21, 27, 00);  % P12
-                  };
+    start_times = load("../Prod/Manual/patient_analysis_start.mat").start_times;
+
+    % Apnea Hypopnea Index for each patient
+    AHI = load("../Prod/Manual/patient_ahi.mat").AHI;
     
     % Get patient data in feature vector
-    for ii = start_patient:end_patient
-        PatientData(patients(ii), start_times{ii}, verbose);
+    if recalc
+        for ii = start_patient:end_patient
+            PatientData(patients(ii), start_times{ii}, verbose);
+        end
     end
+
     if split == "PWISE"
         % Discretise data per patient
+        % ------------------- %
+        % Compile data into one cell array
+        all_data = cell(end_patient-start_patient+1, 1);
+        for ii = start_patient:end_patient
+            dataDir = sprintf("%s/Database/%s/MLDataTable.mat", prefix, patients(ii));
+            patient_data = load(dataDir);
+            all_data{ii-start_patient+1, 1} = patient_data.tabulated_data;
+        end
+        all_data = CellCat(all_data);
     else
         % Pool data
         % ------------------- %
@@ -65,7 +68,7 @@ function PatientDataPrep(start_patient, end_patient, category, split, verbose)
     
     % Attempt to save data
     saveDir = sprintf("../Prod/MLData");
-    saveFile = sprintf("%s/%sData%s.mat", saveDir, category, split);
+    saveFile = sprintf("%s/%s_%s_Data.mat", saveDir, category, split);
     try
         save(saveFile, "all_data", "-mat");
     catch

@@ -2,7 +2,7 @@
 % Author: Joe Byrne
 % Revise subsampling 
 
-function MLAlgo(model_label, category, split, verbose) 
+function [perf, mcc, perf_shuff, mcc_shuff] = MLAlgo(model_label, category, split, verbose) 
 
     if nargin <= 3;  verbose = false; end
     if nargin <= 2;   split = "POOL"; end
@@ -18,8 +18,14 @@ function MLAlgo(model_label, category, split, verbose)
     rng(42)
     
     % Get all data
-    dataDir = sprintf("../../Prod/MLData/%sData%s.mat", category, split);
-    data = load(dataDir).all_data;
+    dataDir = sprintf("../../Prod/MLData/%s_%s_Data.mat", category, split);
+
+    try 
+        data = load(dataDir).all_data;
+    catch 
+        fprintf("Couldn't find file: %s\nQuitting MLAlgo.m...\n", dataDir);
+        return
+    end
     
     %% Data split
     
@@ -28,6 +34,10 @@ function MLAlgo(model_label, category, split, verbose)
     if split == "PWISE"
         % Split data patient-wise
         % ----------------------- %
+        [train, test] = SubSampleSplit(data);
+        
+        if iscell(train); train = CellCat(train); end
+        if iscell(test); test  = CellCat(test); end
     else
         % Pool data split
         % ------------------- %
@@ -38,16 +48,17 @@ function MLAlgo(model_label, category, split, verbose)
         % Partition the data into testing and training data
         [apnea_train, apnea_test] = SubSampleSplit(data_apnea);
         [noapn_train, noapn_test] = SubSampleSplit(data_noapn);
-        
-        % Combine into overall data
+
         train = [apnea_train; noapn_train];
-        train_labels = train.LABEL;
-        train.LABEL = [];
-        
         test  = [apnea_test; noapn_test];
-        test_labels = test.LABEL;
-        test.LABEL = [];
     end
+
+    % Combine into overall data
+    train_labels = train.LABEL;
+    train.LABEL = [];
+    
+    test_labels = test.LABEL;
+    test.LABEL = [];
     
     %% Train model
     
@@ -70,13 +81,15 @@ function MLAlgo(model_label, category, split, verbose)
     
     % Retrieve percentage success rate
     f = kfoldLoss(CVModel);
+    perf = 100*(1 - f);
     fprintf("CrossVal Success Rate:");
-    cprintf("blue", " \t%.2f%%\n", 100*(1 - f));
+    cprintf("blue", " \t%.2f%%\n", perf);
     
     % Use model to predict on test set
     prediction = predict(model,test);
+    mcc = 100*MCC(prediction, test_labels);
     fprintf("Matthews Correlation:");
-    cprintf("blue", " \t%.2f%%\n\n", 100*MCC(prediction, test_labels));
+    cprintf("blue", " \t%.2f%%\n\n", mcc);
     
     %% Shuffle test
     
@@ -100,13 +113,15 @@ function MLAlgo(model_label, category, split, verbose)
     
     % Retrieve percentage success rate
     f = kfoldLoss(cv_model_shuff);
+    perf_shuff = 100*(1 - f);
     fprintf("Shuffle CrossVal Success:");
-    cprintf("blue", " \t%.2f%%\n", 100*(1 - f));
+    cprintf("blue", " \t%.2f%%\n", perf_shuff);
     
     % Use model to predict on test set
     prediction = predict(model_shuf,test);
+    mcc_shuff = 100*MCC(prediction, test_labels);
     fprintf("Matthews Correlation:");
-    cprintf("blue", " \t\t%.2f%%\n\n", 100*MCC(prediction, test_labels));
+    cprintf("blue", " \t\t%.2f%%\n\n", mcc_shuff);
     
     %% Save Model Setup
 
