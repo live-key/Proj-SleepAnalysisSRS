@@ -26,7 +26,7 @@ for ii = 1:size(combos, 1)
     run.category      = combos(ii, 3);
     run.split         = combos(ii, 4);
     run.verbose       = false;
-    run.first         = false;
+    run.recalc        = false;
 
     cprintf("_black", "\n\nPipeline Iteration %i: %s Patients %i-to-%i, %s Data\n\n", ...
         ii, run.split, run.start_patient, run.end_patient, run.category);
@@ -36,8 +36,8 @@ for ii = 1:size(combos, 1)
     
     % Train and evaluate model
     cd MLAlgo
-    svm(ii) = MLAlgo("SVM", run);
-    rfc(ii) = MLAlgo("RFC", run);
+    svm(ii, :) = MLAlgo("SVM", run);
+    rfc(ii, :) = MLAlgo("RFC", run);
     cd ..
 end
 
@@ -70,13 +70,13 @@ if write2excel
         
         while err
             try 
-                ProcWrite(svm, svm_cell, resultsDir);
-                ProcWrite(rfc, rfc_cell, resultsDir);
+                ProcWrite(svm, filePath, sheet, svm_cell);
+                ProcWrite(rfc, filePath, sheet, rfc_cell);
                 
-                fprintf("Data written to file:\t%s\n", resultsDir)
+                fprintf("Data written to file:\t%s\n", filePath)
                 
                 err = false;
-                winopen(resultsDir)
+                winopen(filePath)
             catch 
                 input("Can't save the file - have you closed the file you are trying to write to?:", 's')
                 err = true;

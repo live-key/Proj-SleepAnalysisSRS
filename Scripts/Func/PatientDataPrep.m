@@ -6,8 +6,15 @@ function run = PatientDataPrep(run)
     ep          = run.end_patient;
     category    = run.category;
     split       = run.split;
-    recalc      = run.first;
+    recalc      = run.recalc;
     verbose     = run.verbose;
+
+    % Check save file doesn't exist
+    saveDir = sprintf("../Prod/MLData");
+    saveFile = sprintf("%s/%i-%i_%s_%s_Data.mat", saveDir, sp, ep, category, split);
+    run.filePath = saveFile;
+
+    if isfile(saveFile) && ~recalc; return; end
     
     addpath Func
     addpath MLAlgo/Func
@@ -67,11 +74,6 @@ function run = PatientDataPrep(run)
         cat_idx = cat_tab(:, 1) + cat_tab(:, 2) + cat_tab(:, 3); 
         all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
     end
-    
-    % Attempt to save data
-    saveDir = sprintf("../Prod/MLData");
-    saveFile = sprintf("%s/%i-%i_%s_%s_Data.mat", saveDir, sp, ep, category, split);
-    run.filePath = saveFile;
 
     try
         save(saveFile, "all_data", "-mat");
