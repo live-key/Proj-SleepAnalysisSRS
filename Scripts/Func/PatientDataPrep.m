@@ -74,7 +74,7 @@ function run = PatientDataPrep(run)
         cat_idx = cat_tab(:, 1) + cat_tab(:, 2) + cat_tab(:, 3); 
         all_data = GetSubTable(all_data(logical(cat_idx), :), "STAGE", false);
     end
-
+    
     try
         save(saveFile, "all_data", "-mat");
     catch

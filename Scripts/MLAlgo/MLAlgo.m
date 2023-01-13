@@ -2,7 +2,9 @@
 % Author: Joe Byrne
 % Revise subsampling 
 
-function performance = MLAlgo(model_label, run) 
+function performance = MLAlgo(model_label, run, shuff) 
+    
+    if nargin == 2; shuff = true; end
     
     sp          = run.start_patient;
     ep          = run.end_patient;
@@ -25,7 +27,8 @@ function performance = MLAlgo(model_label, run)
     dataDir = sprintf("../%s", run.filePath);
 
     try 
-        data = load(dataDir).all_data;
+        %data = load(dataDir).all_data;
+        data = load(dataDir).iso;
     catch 
         fprintf("Couldn't find file: %s\nQuitting MLAlgo.m...\n", dataDir);
         return
@@ -100,6 +103,11 @@ function performance = MLAlgo(model_label, run)
         fprintf("Matthews Correlation:");
         cprintf("blue", " \t%.2f%%\n\n", mcc);
     end
+
+    % Function output
+    performance = [perf, mcc];
+
+    if ~shuff; return; end
     
     %% Shuffle test
     
