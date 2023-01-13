@@ -11,7 +11,7 @@ cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
 combos = {
-            1,  12;
+            1, 12;
          };
 
 %% Run Pipeline Combinations
@@ -90,8 +90,8 @@ if input("Write to Excel file? (y/n): ", 's') == "y"
         sheetValid = any(strcmp(sheetNames, sheet));
     end
 
-    eeg_cell = "E4";
-    ssd_cell = "E37";
+    eeg_cell = "C4";
+    ssd_cell = "C37";
     
     % Write data to template file for results
     err = true;
