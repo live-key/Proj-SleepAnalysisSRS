@@ -12,7 +12,7 @@ function performance = MLAlgo(model_label, run, shuff)
     split       = run.split;
     verbose     = run.verbose;
 
-    performance = [];
+    performance = NaN;
 
     %% Setup
     cprintf("black*", "Training and Testing *%s-%s* Model\n\n", model_label, category);
@@ -27,7 +27,7 @@ function performance = MLAlgo(model_label, run, shuff)
     dataDir = sprintf("../%s", run.filePath);
 
     try 
-        %data = load(dataDir).all_data;
+%         data = load(dataDir).all_data;
         data = load(dataDir).iso;
     catch 
         fprintf("Couldn't find file: %s\nQuitting MLAlgo.m...\n", dataDir);

@@ -21,8 +21,8 @@ for ii = 1:size(combos, 1)
     run.start_patient = combos{ii, 1};
     run.end_patient   = combos{ii, 2};
     run.category      = "All";
-    run.split         = "POOL";
-    run.verbose       = false;
+    run.split         = "PWISE";
+    run.verbose       = true;
     run.recalc        = false;
 
     cprintf("_black", "\n\nPipeline Iteration %i: %s Patients %i-to-%i, %s Data\n\n", ...
@@ -37,35 +37,19 @@ for ii = 1:size(combos, 1)
     % Train model on isolated feature
     vars = data.Properties.VariableNames;
     
-    % EEG Features
-    for jj = 1:size(vars, 2)-6
-        % Isolate feature
-        var = vars{jj};
-        fprintf("Feature %s:\t", var);
-        iso = GetSubTable(data, [var, "LABEL"], true);
-        save(run.filePath, "iso", "-append");
-        
-        % Train and evaluate model
-        cd MLAlgo
-            perf = MLAlgo("RFC", run, false);
-            eeg(jj,:) = perf(2);
-        cd ..
-    end
+    % Isolate features
+    iso = GetSubTable(data, ["_3", "_4", "_5"], true);
+    iso = GetSubTable(iso, "STAGE", false);
+    sleep = GetSubTable(data, "STAGE_1", true);
+    lab = GetSubTable(data, "LABEL", true);
+    iso = [iso, sleep, lab];
+    save(run.filePath, "iso", "-append");
     
-    % Sleep Stage Data features
-    for jj = size(vars, 2)-5:size(vars, 2)-1
-        % Isolate feature
-        var = vars{jj};
-        fprintf("Feature %s:\t", var);
-        iso = GetSubTable(data, [var, "LABEL"], true);
-        save(run.filePath, "iso", "-append");
-        
-        % Train and evaluate model
-        cd MLAlgo
-            perf = MLAlgo("RFC", run, false);
-            ssd(jj+1-(size(vars, 2)-5), :) = perf(2);
-        cd ..
-    end
+    % Train and evaluate model
+    cd MLAlgo
+        perf = MLAlgo("RFC", run, false);
+    cd ..
+    
 end
 
 if input("Write to Excel file? (y/n): ", 's') == "y"
@@ -90,15 +74,20 @@ if input("Write to Excel file? (y/n): ", 's') == "y"
         sheetValid = any(strcmp(sheetNames, sheet));
     end
 
+<<<<<<< HEAD
     eeg_cell = "C4";
     ssd_cell = "C37";
+=======
+    eeg_cell = "F4";
+    ssd_cell = "F37";
+>>>>>>> 4151cd3 (feature selection startegies)
     
     % Write data to template file for results
     err = true;
     while err
         try 
-            ProcWrite(eeg, filePath, sheet, eeg_cell);
-            ProcWrite(ssd, filePath, sheet, ssd_cell);
+            ProcWrite(w(1:30), filePath, sheet, eeg_cell);
+            ProcWrite(w(31:end), filePath, sheet, ssd_cell);
             
             fprintf("Data written to file:\t%s\n", filePath)
             

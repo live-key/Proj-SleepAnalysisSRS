@@ -12,15 +12,9 @@ cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
 combos = {
-            1, 6, "All", "POOL";
-            7, 12, "All", "POOL";
-            1, 12, "All", "POOL";
-            1, 6, "All", "PWISE";
-            7, 12, "All", "PWISE";
             1, 12, "All", "PWISE";
          };
 
-combos = {1, 12, "All", "POOL"};
 
 svm = [];
 rfc = [];
@@ -33,7 +27,7 @@ for ii = 1:size(combos, 1)
     run.end_patient   = combos{ii, 2};
     run.category      = combos{ii, 3};
     run.split         = combos{ii, 4};
-    run.verbose       = false;
+    run.verbose       = true;
     run.recalc        = false;
 
     cprintf("_black", "\n\nPipeline Iteration %i: %s Patients %i-to-%i, %s Data\n\n", ...
@@ -44,7 +38,7 @@ for ii = 1:size(combos, 1)
     
     % Train and evaluate model
     cd MLAlgo
-    svm(ii, :) = MLAlgo("SVM", run);
+%     svm(ii, :) = MLAlgo("SVM", run);
     rfc(ii, :) = MLAlgo("RFC", run);
     cd ..
 end
