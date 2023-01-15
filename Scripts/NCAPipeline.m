@@ -1,4 +1,4 @@
-% Pipeline to run PCA 
+% Pipeline to run NCA 
 % Author: Joe Byrne
 
 %% Manual Setup
