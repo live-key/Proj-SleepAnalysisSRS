@@ -16,23 +16,21 @@ function PatientData(patient, start_dt, verbose)
     
     % Field names for struct extraction
     channel_names  = ["Ffour_Mone" , "Fthree_Mtwo" , "Cfour_Mone" , "Cthree_Mtwo" , "Otwo_Mone" , "Oone_Mtwo"];
-    
-    % Remove unwanted data at end of signal
-    CLIP = 3300;
-    
+
+    % Divide all six channels of data into 30s epochs
+    epoch_length = 30;
+
+        
     if verbose; disp("Calculating PSD..."); end
     for ii = 1:length(channel_names)
-         % Divide all six channels of data into 30s epochs
-        epoch_length = 30;
-
+        
         % Get data
         eeg = load(dataDir, channel_names(ii)).(channel_names(ii));
-
+        
         % Clip data to size
-        CLIP = 30*floor(size(eeg,2)/epoch_length);
+        CLIP = epoch_length*floor(size(eeg,2)/epoch_length);
         eeg = eeg(:,1:CLIP);
             
-
         for jj = 0:CLIP/(0.1 * epoch_length) - 1
             % Take 3 x 10s long columns and reshape 
             epoch = eeg(:, jj*3 + 1:(jj+1)*3);

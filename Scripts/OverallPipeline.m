@@ -12,7 +12,7 @@ cprintf("_black", "PIPELINE STARTING\n");
 
 % Patient Combinations
 combos = {
-            1, 12, "All", "PWISE";
+            1, 1, "All", "SPLIT";
          };
 
 
@@ -27,8 +27,8 @@ for ii = 1:size(combos, 1)
     run.end_patient   = combos{ii, 2};
     run.category      = combos{ii, 3};
     run.split         = combos{ii, 4};
-    run.verbose       = true;
-    run.recalc        = false;
+    run.verbose       = false;
+    run.recalc        = true;
 
     cprintf("_black", "\n\nPipeline Iteration %i: %s Patients %i-to-%i, %s Data\n\n", ...
         ii, run.split, run.start_patient, run.end_patient, run.category);

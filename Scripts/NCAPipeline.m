@@ -32,10 +32,18 @@ y = data.LABEL;
 
 mdl = fscnca(x,y,'Solver','sgd','Verbose', int8(run.verbose));
 
+
 vars = data.Properties.VariableNames;
 w = [mdl.FeatureWeights; 0];
 mdl_sat = w > 2.5;
 iso_vars = convertCharsToStrings(vars(mdl_sat == true));
+
+figure()
+plot(mdl.FeatureWeights,'ro')
+grid on
+xlabel('Feature index')
+ylabel('Feature weight')
+title('NCA - P1-P12')
 
 iso = GetSubTable(data, [iso_vars, "LABEL"], true);
 save(run.filePath, "iso", "-append");
